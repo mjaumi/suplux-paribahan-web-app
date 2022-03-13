@@ -173,7 +173,7 @@ namespace SupLuxParibahanWebApp.Controllers
 
             for(int i = 1; i < seats.Length; i++)
             {
-               Session["seats"] = Session["seats"] +", " + seats[i];
+               Session["seats"] = Session["seats"] +"," + seats[i];
             }
 
 
@@ -242,44 +242,55 @@ namespace SupLuxParibahanWebApp.Controllers
     
         }
 
+
+
         public ActionResult ConfirmPayment(string tripDate, string seats, string coachNo)
         {
 
             string[] seat = seats.Split(',');
 
             string utk = DateTime.Now.ToString("yyyyMMdd") + "-" + coachNo + seat[0] + "-" + Convert.ToDateTime(tripDate).ToString("yyyyMMdd");
-            
-            DateTime.Now.ToString("yyyy-MM-dd");
-            String d = Convert.ToDateTime(paymentInfo.tripDate).ToString("yyyy-MM-dd");
-            System.Diagnostics.Debug.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAA", d);
-
             Reservation reservation = new Reservation();
             TransactionLog transactionLog = new TransactionLog();
-            
+
+
+
             foreach (string sed in seat)
             {
-
-                reservation.dateOfJourney = paymentInfo.tripDate;
-                reservation.reservationDate = DateTime.Now.ToString("yyyy-MM-dd");
                 reservation.UTKNo = utk;
-                reservation.coachNo = paymentInfo.coachNo;
-                reservation.userEmail = "mjaumi2864@gmail.com"; //Session["currentEmail"].ToString();
+                reservation.userEmail = "180204060@aust.edu";
+                reservation.coachNo = coachNo;
                 reservation.bookedSeat = sed;
+                string d = DateTime.Now.ToString("yyyy-MM-dd");
+                reservation.reservationDate = d;
+                reservation.dateOfJourney = Session["date"].ToString();
+                reservation.paymentMethod = "bkash";
+                reservation.duePayment = 0;
 
                 database.Reservations.Add(reservation);
                 database.SaveChanges();
 
+
+
+                //Session["currentEmail"].ToString();
+
+
+
+                System.Diagnostics.Debug.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAA", d);
+
+                //string sqlQuery = "Insert into Reservation (UTKNo, userEmail, coachNo, bookedSeat, reservationDate, dateOfJourney, paymentMethod, duePayment) values ('" + reservation.UTKNo+ "' , '" + reservation.userEmail + ", '" + reservation.coachNo + "', '"+ reservation.bookedSeat +"', '"+  )";
+                //database.Reservations.Add(reservation);
+
             }
             
-            
+            //database.SaveChanges();
 
             transactionLog.statusInfo = "Paid";
-            transactionLog.userEmail = "mjaumi2864@gmail.com"; //Session["currentEmail"].ToString();
+            transactionLog.userEmail = "180204060@aust.edu"; //Session["currentEmail"].ToString();
             transactionLog.transactionId = utk;
 
             database.TransactionLogs.Add(transactionLog);
             database.SaveChanges();
-            
 
             return RedirectToAction("Index", "Home");
         }
