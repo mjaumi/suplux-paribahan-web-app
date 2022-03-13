@@ -1,5 +1,10 @@
 ﻿@model List<SupLuxParibahanWebApp.Models.tripData>
-
+@using SupLuxParibahanWebApp.Models;
+@{ 
+    SUPLUXDashboardEntities db = new SUPLUXDashboardEntities();
+    List<Reservation> reservations = new List<Reservation>();
+    string d = Session["date"].ToString();
+}
 @{
     ViewBag.Title = "BUS LIST";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -16,30 +21,32 @@
     </div>
     <div class="container">
         <div class="row d-flex justify-content-center">
-            <div id="modify-search-container" class="search-container">
-                <div class="suplux-search-box">
-                    <div class="autocomplete">
-                        <p>From</p>
-                        <input id="starting-point" type="text" name="from" value="@Session["from"]" placeholder="Enter City" autocomplete="off" />
+            <form action="/Bus/goToModify" method="post">
+                <div id="modify-search-container" class="search-container">
+                    <div class="suplux-search-box">
+                        <div class="autocomplete">
+                            <p>From</p>
+                            <input id="starting-point" type="text" name="from" value="@Session["from"]" placeholder="Enter City" autocomplete="off" required />
+                        </div>
+                    </div>
+                    <div class="suplux-search-box">
+                        <div class="autocomplete">
+                            <p>To</p>
+                            <input id="ending-point" type="text" name="to" value="@Session["to"]" placeholder="Enter City" autocomplete="off" required />
+                        </div>
+                    </div>
+                    <div class="suplux-search-box suplux-date-box">
+                        <p>journey date</p>
+                        <input id="suplux-datepicker" class="date" type="text" name="date" value="@Session["date"]" readonly="readonly" placeholder="Enter City" required />
+                        <p id="suplux-day">Day</p>
+                    </div>
+                    <div class="search-btn-container">
+                        <button id="bus-search-btn" class="suplux-btn"><i class="fas fa-search"></i>Modify Search</button>
                     </div>
                 </div>
-                <div class="suplux-search-box">
-                    <div class="autocomplete">
-                        <p>To</p>
-                        <input id="ending-point" type="text" name="to" value="@Session["to"]" placeholder="Enter City" autocomplete="off" />
-                    </div>
-                </div>
-
-                <div class="suplux-search-box suplux-date-box">
-                    <p>journey date</p>
-                    <input id="suplux-datepicker" class="date" type="text" name="to" value="" readonly="readonly" placeholder="Enter City" />
-                    <p id="suplux-day">Day</p>
-                </div>
-                <div class="search-btn-container">
-                    <button id="bus-search-btn" class="suplux-btn"><i class="fas fa-search"></i>Modify Search</button>
-                </div>
-            </div>
+            </form>
         </div>
+
         <div id="mobile-edit-hide-container" class="d-none">
             <div>
                 <h6>Dhaka - Khulna</h6>
@@ -86,7 +93,7 @@
                     <div class="coach-result-row">
                         <div class="coach-result-div">
                             <div class="d-flex flex-column align-center">
-                                <h1 class="from-short">@item.startingFrom.Substring(0,3).ToUpper()</h1>
+                                <h1 class="from-short">@item.startingFrom.Substring(0, 3).ToUpper()</h1>
                                 <p>@item.startingFrom</p>
                             </div>
                             <svg version="1.1" class="from-to-arrow" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 612.074 612.074" style="enable-background:new 0 0 612.074 612.074;" xml:space="preserve">
@@ -101,7 +108,7 @@
                         </path>
                     </svg>
                             <div class="d-flex flex-column align-center">
-                                <h1 class="to-short">@item.destination.Substring(0,3).ToUpper()</h1>
+                                <h1 class="to-short">@item.destination.Substring(0, 3).ToUpper()</h1>
                                 <p>@item.destination</p>
                             </div>
                         </div>
@@ -123,8 +130,19 @@
                         </div>
                         <div class="coach-result-div two">
                             <div>
+                                @{
+                                    
+                                    string sqlQuery = "select * from Reservation where coachNo = '" + @item.coachNo + "' and dateOfJourney = '" + d + "' ";//+ d + "' \""; //+ @Session["date"] +"\"";
+
+
+                                    reservations = db.Reservations.SqlQuery(sqlQuery).ToList();
+
+                                    int availSeats = 31 - reservations.Count();
+                                }
+
                                 <p class="result-data">Available Seats</p>
-                                <h3 class="result-data">31</h3>
+                                <h3 class="result-data">@availSeats</h3>
+
                             </div>
                             <div>
                                 <p class="result-data">Fare</p>
@@ -167,8 +185,8 @@
                                         <h3 class="trip-data">@item.coachType</h3>
                                     </div>
                                 </div>
-                                
-                                
+
+
                                 <div class="trip-info-wrapper">
                                     <div class="trip-info">
                                         <p class="result-data">Reporting Time</p>
@@ -206,7 +224,7 @@
                             </div>
                             <form action="/Bus/goToPayment" method="post">
                                 <div class="continue-btn-container">
-                                    <button class="suplux-btn continue-btn" type="submit" name="contype" value="@item.coachNo">Continue</button>
+                                    <button class="suplux-btn continue-btn" type="submit" name="contype" value="@item.coachNo @item.departureTime">Continue</button>
                                 </div>
                             </form>
                         </div>
@@ -289,8 +307,19 @@
                         </div>
                         <div class="coach-result-div two">
                             <div>
+                                @{
+
+                                    string sqlQuery = "select * from Reservation where coachNo = '" + @item.coachNo + "' and dateOfJourney = '" + d + "' ";//+ d + "' \""; //+ @Session["date"] +"\"";
+
+
+                                    reservations = db.Reservations.SqlQuery(sqlQuery).ToList();
+
+                                    int availSeats = 28 - reservations.Count();
+                                }
+
                                 <p class="result-data">Available Seats</p>
-                                <h3 class="result-data">28</h3>
+                                <h3 class="result-data">@availSeats</h3>
+
                             </div>
                             <div>
                                 <p class="result-data">Fare</p>
@@ -336,7 +365,7 @@
                                 <div class="trip-info-wrapper">
                                     <div class="trip-info">
                                         <p class="result-data">Reporting Time</p>
-                                        <h3 class="trip-data">@item.departureTime, @Session["date"]</h3>
+                                        <h3 class="trip-data">@item.departureTime, @Session["date"].ToString()</h3>
                                     </div>
                                 </div>
                                 <div class="trip-info-wrapper">
@@ -358,7 +387,6 @@
                                         </tr>
                                     </thead>
                                     <tbody class="selected-seats-table-body">
-
                                     </tbody>
                                     <tfoot>
                                         <tr>
@@ -371,7 +399,7 @@
                             </div>
                             <form action="/Bus/goToPayment" method="post">
                                 <div class="continue-btn-container">
-                                    <button class="suplux-btn continue-btn" type="submit" name="contype" value="@item.coachNo">Continue</button>
+                                    <button class="suplux-btn continue-btn" type="submit" name="contype" value="@item.coachNo @item.departureTime">Continue</button>
                                 </div>
                             </form>
                         </div>
@@ -453,8 +481,19 @@
                         </div>
                         <div class="coach-result-div two">
                             <div>
+                                @{
+
+                                    string sqlQuery = "select * from Reservation where coachNo = '" + @item.coachNo + "' and dateOfJourney = '" + d + "' ";//+ d + "' \""; //+ @Session["date"] +"\"";
+
+
+                                    reservations = db.Reservations.SqlQuery(sqlQuery).ToList();
+
+                                    int availSeats = 41 - reservations.Count();
+                                }
+
                                 <p class="result-data">Available Seats</p>
-                                <h3 class="result-data">41</h3>
+                                <h3 class="result-data">@availSeats</h3>
+
                             </div>
                             <div>
                                 <p class="result-data">Fare</p>
@@ -534,7 +573,7 @@
                             </div>
                             <form action="/Bus/goToPayment" method="post">
                                 <div class="continue-btn-container">
-                                    <button class="suplux-btn continue-btn" type="submit" name="contype" value="@item.coachNo">Continue</button>
+                                    <button class="suplux-btn continue-btn" type="submit" name="contype" value="@item.coachNo @item.departureTime">Continue</button>
                                 </div>
                             </form>
                         </div>
@@ -566,9 +605,10 @@
                         </div>
                     </div>
                 </div>
-            }
-        }
-     </div>
+                                            }
+                                        
+                                    }
+    </div>
 </section>
 
 <!--    seat maxed out modal    -->
@@ -625,5 +665,5 @@
 @Scripts.Render("~/Scripts/jquery-3.4.1.min.js")
 @Scripts.Render("~/Scripts/jquery-ui.min.js")
 @Scripts.Render("~/Scripts/autocomplete-field.js")
-@Scripts.Render("~/Scripts/date-picker.js")
+@Scripts.Render("~/Scripts/modify-date-picker.js")
 @Scripts.Render("~/Scripts/list.js")
