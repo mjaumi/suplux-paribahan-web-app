@@ -183,15 +183,32 @@ namespace SupLuxParibahanWebApp.Controllers
         }
 
         public ActionResult ConfirmPayment() {
-            string utk="";
-            Reservation reservation=new Reservation();
             
-            reservation.dateOfJourney = Convert.ToDateTime(paymentInfo.tripDate);
-            reservation.reservationDate=DateTime.Now;
-            reservation.UTKNo = utk;
-            reservation.coachNo=paymentInfo.coachNo;
-            reservation.userEmail = Session["currentEmail"].ToString();
-            reservation.bookedSeat = paymentInfo.seatConcat;
+            string[] seat = paymentInfo.seatConcat.Split(',');
+            
+            string utk=DateTime.Now.ToString("yyyyMMdd") + "-" + paymentInfo.coachNo + seat[0] + "-" + Convert.ToDateTime(paymentInfo.tripDate).ToString("yyyyMMdd");
+            Reservation reservation=new Reservation();
+            TransactionLog transactionLog = new TransactionLog();
+            
+            foreach (string sed in seat) {
+             
+                reservation.dateOfJourney = Convert.ToDateTime(paymentInfo.tripDate);
+                reservation.reservationDate = DateTime.Now;
+                reservation.UTKNo = utk;
+                reservation.coachNo = paymentInfo.coachNo;
+                reservation.userEmail = Session["currentEmail"].ToString();
+                reservation.bookedSeat = sed;
+
+                transactionLog.statusInfo = "Paid";
+                transactionLog.userEmail = Session["currentEmail"].ToString();
+                transactionLog.transactionId = utk;
+
+                database.Reservations.Add(reservation);
+                database.SaveChanges();
+
+                database.TransactionLogs.Add(transactionLog);
+                database.SaveChanges();
+            }
 
             return RedirectToAction("Index","Home");
         }
