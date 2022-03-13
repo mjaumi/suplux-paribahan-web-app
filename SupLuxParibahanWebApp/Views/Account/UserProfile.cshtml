@@ -1,9 +1,14 @@
 ﻿@model SupLuxParibahanWebApp.Models.UserTable
+@using SupLuxParibahanWebApp.Models
 @{
     ViewBag.Title = "USER PROFILE";
     @Styles.Render("~/Content/user-profile-page.css")
 }
 
+@{
+
+    IEnumerable<TransactionLog> transactionLogs = ViewData["Transactions"] as IEnumerable<TransactionLog>;
+}
 
   
 
@@ -136,7 +141,19 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
+                                    @if (transactionLogs !=null)
+                                    {
+                                        foreach (TransactionLog transaction in transactionLogs)
+                                        {
+                                            <th scope="row">@transaction.transactionNo</th>
+                                            <td>@transaction.transactionId</td>
+                                            <td>12-02-2022</td>
+                                            <td>14-02-2022</td>
+                                            <td>@transaction.statusInfo</td>
+                                        }
+                                     }
+
+                                    <!--<tr>
                                         <th scope="row">1</th>
                                         <td>120220221644-M4013D3-140220222230</td>
                                         <td>12-02-2022</td>
@@ -156,9 +173,9 @@
                                         <td>12-02-2022</td>
                                         <td>14-02-2022</td>
                                         <td>CANCELLED</td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                    </tr>-->
+                                    </tbody>
+                                </table>
                         </div>
                     </div>
                     <!--    Settings section    -->

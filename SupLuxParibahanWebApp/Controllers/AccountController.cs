@@ -61,12 +61,15 @@ namespace SupLuxParibahanWebApp.Controllers
             if (uEmail.Contains("@suplux.com"))
             {
                 var getAdmin = db.Admins.SingleOrDefault(x => x.adminEmail.Equals(uEmail) && x.adminPassword.Equals(uPassword));
+                
+
 
                 if (getAdmin !=null)
                 {
                     Session["currentEmail"] = uEmail;
                     Session["AdminNick"] = getAdmin.adminNick;
 
+                    
                     TempData["notification"] = "success";
                     return RedirectToAction("AdminHome", "Admin");
                 }
@@ -86,6 +89,12 @@ namespace SupLuxParibahanWebApp.Controllers
                     Session["currentEmail"] = uEmail;
                     Session["currentUsername"] = getUser.userName;
                     //Session["currentUserName"]=userTable.userPassword.ToString();
+                    
+                    List<TransactionLog> translog = new List<TransactionLog>();
+                    translog = db.TransactionLogs.Where(x => x.userEmail.Equals(uEmail)).ToList();
+                    ViewData["Transactions"] = translog;
+
+
                     TempData["notification"] = "log in success";
                     return RedirectToAction("Index", "Home");
                 }
