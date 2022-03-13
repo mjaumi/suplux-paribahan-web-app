@@ -11,7 +11,7 @@ namespace SupLuxParibahanWebApp.Controllers
     public class BusController : Controller
     {
        
-        SUPLUXDashboardEntities database = new SUPLUXDashboardEntities();
+        SUPLUXDashboardEntities2 database = new SUPLUXDashboardEntities2();
         PaymentInfo paymentInfo = new PaymentInfo();
         JourneyDetails journeyDetails = new JourneyDetails();
         
@@ -248,24 +248,30 @@ namespace SupLuxParibahanWebApp.Controllers
             string[] seat = seats.Split(',');
 
             string utk = DateTime.Now.ToString("yyyyMMdd") + "-" + coachNo + seat[0] + "-" + Convert.ToDateTime(tripDate).ToString("yyyyMMdd");
+            
+            DateTime.Now.ToString("yyyy-MM-dd");
+            String d = Convert.ToDateTime(paymentInfo.tripDate).ToString("yyyy-MM-dd");
+            System.Diagnostics.Debug.WriteLine("AAAAAAAAAAAAAAAAAAAAAAAAAAAA", d);
+
             Reservation reservation = new Reservation();
             TransactionLog transactionLog = new TransactionLog();
-
+            
             foreach (string sed in seat)
             {
 
-                reservation.dateOfJourney = Convert.ToDateTime(tripDate);
-                reservation.reservationDate = DateTime.Now;
+                reservation.dateOfJourney = paymentInfo.tripDate;
+                reservation.reservationDate = DateTime.Now.ToString("yyyy-MM-dd");
                 reservation.UTKNo = utk;
                 reservation.coachNo = paymentInfo.coachNo;
                 reservation.userEmail = "mjaumi2864@gmail.com"; //Session["currentEmail"].ToString();
                 reservation.bookedSeat = sed;
 
                 database.Reservations.Add(reservation);
-                
+                database.SaveChanges();
+
             }
             
-            database.SaveChanges();
+            
 
             transactionLog.statusInfo = "Paid";
             transactionLog.userEmail = "mjaumi2864@gmail.com"; //Session["currentEmail"].ToString();
@@ -273,6 +279,7 @@ namespace SupLuxParibahanWebApp.Controllers
 
             database.TransactionLogs.Add(transactionLog);
             database.SaveChanges();
+            
 
             return RedirectToAction("Index", "Home");
         }

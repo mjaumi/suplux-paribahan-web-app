@@ -19,10 +19,11 @@ namespace SupLuxParibahanWebApp.Models
         public string userEmail { get; set; }
         public string coachNo { get; set; }
         public string bookedSeat { get; set; }
-        public Nullable<System.DateTime> reservationDate { get; set; }
-        public Nullable<System.DateTime> dateOfJourney { get; set; }
+        public string reservationDate { get; set; }
+        public string dateOfJourney { get; set; }
         public string paymentMethod { get; set; }
         public int duePayment { get; set; }
+        public string reservationStatus { get; set; }
     
         public virtual tripData tripData { get; set; }
         public virtual UserTable UserTable { get; set; }
