@@ -182,6 +182,19 @@ namespace SupLuxParibahanWebApp.Controllers
     
         }
 
+        public ActionResult ConfirmPayment() {
+            string utk="";
+            Reservation reservation=new Reservation();
+            
+            reservation.dateOfJourney = Convert.ToDateTime(paymentInfo.tripDate);
+            reservation.reservationDate=DateTime.Now;
+            reservation.UTKNo = utk;
+            reservation.coachNo=paymentInfo.coachNo;
+            reservation.userEmail = Session["currentEmail"].ToString();
+            reservation.bookedSeat = paymentInfo.seatConcat;
+
+            return RedirectToAction("Index","Home");
+        }
         
     }
 }
